@@ -21,11 +21,11 @@ public class TodoController {
         return service.getAllTodos();
     }
 
-    @PostMapping
-    public Todo addTodo(@RequestParam String title) {
-        return service.add(title);
-    }
 
+    @PostMapping
+    public Todo addTodo(@RequestBody Todo todo) {
+        return service.addTodo(todo);
+    }
     @PutMapping("/{id}/done")
     public Todo markDone(@PathVariable Long id) {
         return service.markDone(id).orElseThrow(() -> new RuntimeException("Todo not found"));

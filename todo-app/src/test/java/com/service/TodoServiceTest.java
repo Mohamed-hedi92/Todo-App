@@ -42,6 +42,45 @@ public class TodoServiceTest {
     }
 
     @Test
+    public void testAddTodo() {
+        Todo newTodo = new Todo("Neue Aufgabe");
+        Todo savedTodo = new Todo(1L, "Neue Aufgabe", false);
+
+        when(todoRepository.save(newTodo)).thenReturn(savedTodo);
+
+        Todo result = todoService.addTodo(newTodo);
+        assertNotNull(result);
+        assertEquals("Neue Aufgabe", result.getTitle());
+        verify(todoRepository).save(newTodo);
+    }
+
+    @Test
+    public void testUpdateTodo() {
+        Long id = 1L;
+        Todo existing = new Todo(id, "Alt", false);
+        Todo updated = new Todo(id, "Neu", true);
+
+        when(todoRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(todoRepository.save(any(Todo.class))).thenReturn(updated);
+
+        Optional<Todo> result = todoService.updateTodo(id, updated);
+
+        assertTrue(result.isPresent());
+        assertEquals("Neu", result.get().getTitle());
+        assertTrue(result.get().isDone());
+        verify(todoRepository).save(any(Todo.class));
+    }
+
+    @Test
+    public void testDeleteTodo() {
+        Long id = 1L;
+        doNothing().when(todoRepository).deleteById(id);
+
+        todoService.deleteTodo(id);
+
+        verify(todoRepository).deleteById(id);
+    }
+    @Test
     public void testMarkTodoDone() {
         Long id = 1L;
         Todo todo = new Todo("Test Done");
@@ -56,6 +95,68 @@ public class TodoServiceTest {
         assertTrue(result.isPresent());
         assertTrue(result.get().isDone());
         verify(todoRepository).save(todo);
+    }
+
+    @Test
+    public void testUpdateTodo_NotFound() {
+        Long id = 999L;
+        Todo updated = new Todo(id,"Titel", true);
+
+        when(todoRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Todo> result = todoService.updateTodo(id, updated);
+
+        assertTrue(result.isEmpty());
+        verify(todoRepository, never()).save(any());
+    }
+
+    @Test
+    public void testGetAllTodos_EmptyList() {
+        when(todoRepository.findAll()).thenReturn(List.of());
+
+        List<Todo> result = todoService.getAllTodos();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testMarkTodoDone_NotFound() {
+        Long id = 9000L;
+
+        when(todoRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Todo> result = todoService.markDone(id);
+
+        assertTrue(result.isEmpty());
+        verify(todoRepository, never()).save(any());
+    }
+
+    @Test
+    public void testAddByTitle() {
+        String title = "Neue Aufgabe per Titel";
+        Todo todoToSave = new Todo(title);
+        Todo savedTodo = new Todo(1L, title, false);
+
+        when(todoRepository.save(any(Todo.class))).thenReturn(savedTodo);
+
+        Todo result = todoService.add(title);
+
+        assertNotNull(result);
+        assertEquals(title, result.getTitle());
+        verify(todoRepository).save(any(Todo.class));
+    }
+
+    @Test
+    public void testDeleteTodo_NotExistingId() {
+        Long id = 9000L;
+
+
+        doNothing().when(todoRepository).deleteById(id);
+
+        todoService.deleteTodo(id);
+
+        verify(todoRepository).deleteById(id);
     }
 }
 

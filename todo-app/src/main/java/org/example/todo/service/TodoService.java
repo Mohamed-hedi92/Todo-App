@@ -24,6 +24,10 @@ public class TodoService {
         return repository.save(new Todo(title));
     }
 
+    public Todo addTodo(Todo todo) {
+        return repository.save(todo);
+    }
+
     public Optional<Todo> markDone(Long id) {
         Optional<Todo> todo = repository.findById(id);
         todo.ifPresent(t -> {
@@ -31,5 +35,17 @@ public class TodoService {
             repository.save(t);
         });
         return todo;
+    }
+
+    public Optional<Todo> updateTodo(Long id, Todo updatedTodo) {
+        return repository.findById(id).map(existingTodo -> {
+            existingTodo.setTitle(updatedTodo.getTitle());
+            existingTodo.setDone(updatedTodo.isDone());
+            return repository.save(existingTodo);
+        });
+    }
+
+    public void deleteTodo(Long id) {
+        repository.deleteById(id);
     }
 }
