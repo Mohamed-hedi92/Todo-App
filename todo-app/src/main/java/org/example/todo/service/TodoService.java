@@ -31,12 +31,11 @@ public class TodoService {
     public Optional<Todo> markDone(Long id) {
         Optional<Todo> todo = repository.findById(id);
         todo.ifPresent(t -> {
-            t.setDone(true);
+            t.setDone(!t.isDone()); // Toggle: true → false oder false → true
             repository.save(t);
         });
         return todo;
     }
-
     public Optional<Todo> updateTodo(Long id, Todo updatedTodo) {
         return repository.findById(id).map(existingTodo -> {
             existingTodo.setTitle(updatedTodo.getTitle());
@@ -45,7 +44,24 @@ public class TodoService {
         });
     }
 
+    public Todo updateTitle(Long id, String newTitle) {
+        Optional<Todo> optionalTodo = repository.findById(id);
+        if (optionalTodo.isEmpty()) {
+            throw new RuntimeException("Todo not found");
+        }
+        Todo todo = optionalTodo.get();
+        todo.setTitle(newTitle);
+        return repository.save(todo);
+    }
+
     public void deleteTodo(Long id) {
         repository.deleteById(id);
+    }
+
+    public Optional<Todo> toggleDone(Long id) {
+        return repository.findById(id).map(todo -> {
+            todo.setDone(!todo.isDone());
+            return repository.save(todo);
+        });
     }
 }

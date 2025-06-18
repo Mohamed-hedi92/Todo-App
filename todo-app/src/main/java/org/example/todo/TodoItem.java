@@ -27,6 +27,7 @@ package org.example.todo;
             this.done = true;
         }
 
+
         @Override
         public String toString() {
             return (done ? "[x] " : "[ ] ") + id + ": " + title;

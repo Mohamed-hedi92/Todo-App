@@ -30,4 +30,16 @@ public class TodoController {
     public Todo markDone(@PathVariable Long id) {
         return service.markDone(id).orElseThrow(() -> new RuntimeException("Todo not found"));
     }
+
+    @PutMapping("/{id}/title")
+    public Todo updateTitle(@PathVariable Long id, @RequestBody String newTitle) {
+
+        newTitle = newTitle.replaceAll("^\"|\"$", "");
+        return service.updateTitle(id, newTitle);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTodo(@PathVariable Long id) {
+        service.deleteTodo(id);
+    }
 }

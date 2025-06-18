@@ -158,5 +158,109 @@ public class TodoServiceTest {
 
         verify(todoRepository).deleteById(id);
     }
+
+    @Test
+    public void testAddMultipleTodos() {
+        Todo t1 = new Todo("eins");
+        Todo t2 = new Todo("zwei");
+        Todo saved1 = new Todo(1L, "eins", false);
+        Todo saved2 = new Todo(2L, "zwei", false);
+
+        when(todoRepository.save(t1)).thenReturn(saved1);
+        when(todoRepository.save(t2)).thenReturn(saved2);
+
+        Todo r1 = todoService.addTodo(t1);
+        Todo r2 = todoService.addTodo(t2);
+
+        assertEquals("eins", r1.getTitle());
+        assertEquals("zwei", r2.getTitle());
+
+        verify(todoRepository).save(t1);
+        verify(todoRepository).save(t2);
+    }
+
+    @Test
+    public void testToggleDone_TogglesFromFalseToTrueAndBack() {
+        Long id = 1L;
+
+
+        Todo todoFalse = new Todo(id, "Aufgabe", false);
+        Todo todoTrue = new Todo(id, "Aufgabe", true);
+
+        when(todoRepository.findById(id)).thenReturn(Optional.of(todoFalse));
+        when(todoRepository.save(any())).thenReturn(todoTrue);
+
+        Optional<Todo> result1 = todoService.toggleDone(id);
+
+        assertTrue(result1.isPresent());
+        assertTrue(result1.get().isDone());
+        verify(todoRepository).save(any());
+
+
+        Todo todoTrueNow = new Todo(id, "Aufgabe", true);
+        Todo todoFalseAgain = new Todo(id, "Aufgabe", false);
+
+        when(todoRepository.findById(id)).thenReturn(Optional.of(todoTrueNow));
+        when(todoRepository.save(any())).thenReturn(todoFalseAgain);
+
+        Optional<Todo> result2 = todoService.toggleDone(id);
+
+        assertTrue(result2.isPresent());
+        assertFalse(result2.get().isDone());
+    }
+
+    @Test
+    public void testDeleteTodo_RepositoryThrowsException() {
+        Long id = 42L;
+        doThrow(new RuntimeException("DB Fehler")).when(todoRepository).deleteById(id);
+
+        assertThrows(RuntimeException.class, () -> {
+            todoService.deleteTodo(id);
+        });
+
+        verify(todoRepository).deleteById(id);
+    }
+
+    @Test
+    public void testToggleDone_TodoNotFound() {
+        Long id = 999L;
+
+        when(todoRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Todo> result = todoService.toggleDone(id);
+
+        assertTrue(result.isEmpty());
+        verify(todoRepository, never()).save(any());
+    }
+
+    @Test
+    public void testUpdateTitle_Success() {
+        Long id = 1L;
+        String newTitle = "Updated Title";
+        Todo existing = new Todo(id, "Old Title", false);
+        Todo updated = new Todo(id, newTitle, false);
+
+        when(todoRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(todoRepository.save(any(Todo.class))).thenReturn(updated);
+
+        Todo result = todoService.updateTitle(id, newTitle);
+
+        assertNotNull(result);
+        assertEquals(newTitle, result.getTitle());
+        verify(todoRepository).save(any(Todo.class));
+    }
+
+    @Test
+    public void testAddTodo_WithEmptyTitle() {
+        Todo emptyTitleTodo = new Todo("");
+
+        when(todoRepository.save(emptyTitleTodo)).thenReturn(emptyTitleTodo);
+
+        Todo result = todoService.addTodo(emptyTitleTodo);
+
+        assertNotNull(result);
+        assertEquals("", result.getTitle());
+        verify(todoRepository).save(emptyTitleTodo);
+    }
 }
 
