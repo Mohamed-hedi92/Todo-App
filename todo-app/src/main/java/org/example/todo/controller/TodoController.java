@@ -23,6 +23,12 @@ public class TodoController {
         return service.getAllTodos();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Todo> getTodoById(@PathVariable Long id) {
+        return service.getTodoById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping
     public ResponseEntity<Todo> addTodo(@RequestBody Todo todo) {

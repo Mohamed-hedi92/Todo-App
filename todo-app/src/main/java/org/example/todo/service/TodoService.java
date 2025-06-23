@@ -69,4 +69,7 @@ public class TodoService {
         repository.deleteAll();
     }
 
+    public Optional<Todo> getTodoById(Long id) {
+        return repository.findById(id);
+    }
 }
