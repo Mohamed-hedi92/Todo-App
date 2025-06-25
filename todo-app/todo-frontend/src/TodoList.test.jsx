@@ -3,6 +3,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TodoList from "./TodoList";
 import axios from "axios";
+import '@testing-library/jest-dom';
+
 
 jest.mock("axios");
 
@@ -79,6 +81,8 @@ describe("TodoList", () => {
 
     // Testet, dass kein Todo hinzugefügt wird, wenn Eingabefeld leer ist
     it("fügt kein Todo hinzu, wenn das Eingabefeld leer ist", async () => {
+      axios.post.mockClear();
+
       render(<TodoList />);
       const button = screen.getByText(/Hinzufügen/i);
 

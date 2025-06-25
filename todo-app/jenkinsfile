@@ -45,12 +45,19 @@ pipeline {
                 }
             }
         }
+        stage('Verify Tests Exist') {
+            steps {
+                dir('todo-app/todo-frontend/src') {
+                    bat 'dir /B'
+                }
+            }
+        }
 
         stage('Frontend Test') {
             steps {
                 echo 'Running frontend tests...'
                 dir('todo-app/todo-frontend') {
-                    bat 'set CI=true && npm test -- --watchAll=false --passWithNoTests'
+                    bat 'npm test'
 
                 }
             }
