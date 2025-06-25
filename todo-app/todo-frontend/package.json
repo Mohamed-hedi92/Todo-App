@@ -43,13 +43,6 @@
     "@testing-library/react": "^16.3.0",
     "babel-jest": "^30.0.2",
     "identity-obj-proxy": "^3.0.0"
-  },
-  "jest": {
-    "roots": ["<rootDir>/src"],
-    "testMatch": [
-      "**/__tests__/**/*.[jt]s?(x)",
-      "**/?(*.)+(spec|test).[jt]s?(x)"
-    ]
   }
 
 }
