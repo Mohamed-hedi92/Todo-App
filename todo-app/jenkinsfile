@@ -50,7 +50,7 @@ pipeline {
             steps {
                 echo 'Running frontend tests...'
                 dir('todo-app/todo-frontend') {
-                    bat 'npm test -- --watchAll --passWithNoTests'
+                    bat 'npm test'
                 }
             }
         }
