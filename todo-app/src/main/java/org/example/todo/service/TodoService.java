@@ -31,7 +31,7 @@ public class TodoService {
     public Optional<Todo> markDone(Long id) {
         Optional<Todo> todo = repository.findById(id);
         todo.ifPresent(t -> {
-            t.setDone(!t.isDone()); // Toggle: true → false oder false → true
+            t.setDone(!t.isDone());
             repository.save(t);
         });
         return todo;

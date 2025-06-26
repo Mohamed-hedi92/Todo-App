@@ -74,11 +74,12 @@ function TodoList() {
       <div className="todo-input">
         <input
           type="text"
+          name="new-todo"
           placeholder="Neue Aufgabe"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
         />
-        <button onClick={addTodo}>Hinzufügen</button>
+        <button id="add-todo" onClick={addTodo}>Hinzufügen</button>
       </div>
       <ul>
         {todos.map((todo) => (
