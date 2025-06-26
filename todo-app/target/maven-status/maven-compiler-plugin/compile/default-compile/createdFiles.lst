@@ -1,7 +1,0 @@
-org\example\Main.class
-org\example\todo\TodoItem.class
-org\example\todo\TodoApp.class
-org\example\todo\model\Todo.class
-org\example\todo\service\TodoService.class
-org\example\todo\repository\TodoRepository.class
-org\example\todo\TodoAppApplication.class

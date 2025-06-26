@@ -1,0 +1,132 @@
+
+openapi: 3.0.3
+info:
+  title: Todo API
+  description: Eine einfache REST-API zur Verwaltung von Todos.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8085
+    description: Lokale Entwicklungsumgebung (Spring Boot)
+
+paths:
+  /todos:
+    get:
+      summary: Liste aller Todos abrufen
+      responses:
+        '200':
+          description: Erfolgreich geladen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Ein neues Todo hinzufügen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      responses:
+        '201':
+          description: Todo erfolgreich erstellt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /todos/{id}:
+    get:
+      summary: Ein einzelnes Todo abrufen
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Todo gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo nicht gefunden
+    delete:
+      summary: Todo löschen
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Todo gelöscht
+
+  /todos/{id}/done:
+    put:
+      summary: "Markiere Todo als erledigt oder nicht erledigt (Toggle)"
+      description: |
+        Ändert den Status eines Todos:
+        - Wenn `done=false`, wird es auf `true` gesetzt.
+        - Wenn `done=true`, wird es auf `false` zurückgesetzt.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Erfolgreich aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo wurde nicht gefunden
+
+  /todos/{id}/title:
+    put:
+      summary: Titel eines Todos ändern
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Titel geändert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo nicht gefunden
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Einkaufen"
+        done:
+          type: boolean
+          example: false
