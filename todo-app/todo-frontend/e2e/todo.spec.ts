@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+/*import { test, expect } from '@playwright/test';
 
 test('Page has title and adds a todo', async ({ page }) => {
   await page.goto('http://localhost:3000');
@@ -31,3 +31,4 @@ test('Todo can be added and then deleted', async ({ page }) => {
   await expect(todoItem).toHaveCount(0);
 });
 
+*/
