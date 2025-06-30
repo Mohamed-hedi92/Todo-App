@@ -6,5 +6,8 @@ module.exports = {
   transform: {
     "^.+\\.[jt]sx?$": "babel-jest"
   },
-  testPathIgnorePatterns: ["<rootDir>/e2e/"]
+  testMatch: [
+    "**/src/**/*.test.[jt]s?(x)",
+    "**/src/**/*.spec.[jt]s?(x)"
+  ]
 };
