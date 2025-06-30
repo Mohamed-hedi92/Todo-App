@@ -6,12 +6,11 @@ module.exports = {
   transform: {
     "^.+\\.[jt]sx?$": "babel-jest"
   },
-  testMatch: [
-    "**/src/**/*.test.[jt]s?(x)",
-    "**/src/**/*.spec.[jt]s?(x)"
-  ],
-    testPathIgnorePatterns: [
-      "/node_modules/",
-      "/e2e/"
-    ]
+testMatch: [
+  "**/?(*.)+(spec|test).[jt]s?(x)"
+],
+testPathIgnorePatterns: [
+  "/node_modules/",
+  "/e2e/"
+]
 };
