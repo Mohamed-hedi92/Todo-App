@@ -59,7 +59,7 @@ pipeline {
             steps {
                 echo 'Running frontend Jest tests...'
                 dir('todo-app/todo-frontend') {
-                    bat 'npm test'
+                    bat 'npm test -- --config jest.config.js'
                 }
             }
         }
