@@ -9,5 +9,9 @@ module.exports = {
   testMatch: [
     "**/src/**/*.test.[jt]s?(x)",
     "**/src/**/*.spec.[jt]s?(x)"
-  ]
+  ],
+    testPathIgnorePatterns: [
+      "/node_modules/",
+      "/e2e/"
+    ]
 };
