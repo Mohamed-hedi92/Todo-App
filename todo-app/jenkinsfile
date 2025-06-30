@@ -46,6 +46,15 @@ pipeline {
             }
         }
 
+        stage('Verify Tests Exist') {
+            steps {
+                dir('todo-app/todo-frontend/src') {
+                    bat 'dir /B'
+                }
+            }
+        }
+
+
         stage('Frontend Jest Unit Tests') {
             steps {
                 echo 'Running frontend Jest tests...'

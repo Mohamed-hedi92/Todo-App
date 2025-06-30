@@ -14,7 +14,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest src",
+    "test": "jest --config jest.config.js",
     "e2e": "playwright test",
     "eject": "react-scripts eject"
   },
