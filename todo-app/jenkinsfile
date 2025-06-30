@@ -28,9 +28,9 @@ pipeline {
             }
         }
 
-        stage('Backend Test') {
+        stage('Backend Unit Tests') {
             steps {
-                echo 'Running backend tests...'
+                echo 'Running backend unit tests...'
                 dir('todo-app') {
                     bat 'mvn test'
                 }
@@ -45,20 +45,32 @@ pipeline {
                 }
             }
         }
-        stage('Verify Tests Exist') {
+
+        stage('Frontend Jest Unit Tests') {
             steps {
-                dir('todo-app/todo-frontend/src') {
-                    bat 'dir /B'
+                echo 'Running frontend Jest tests...'
+                dir('todo-app/todo-frontend') {
+                    bat 'npm test'
                 }
             }
         }
 
-        stage('Frontend Test') {
+        stage('Start Backend') {
             steps {
-                echo 'Running frontend tests...'
-                dir('todo-app/todo-frontend') {
-                    bat 'npm test'
+                echo 'Starting backend for Playwright tests...'
+                dir('todo-app') {
+                    bat 'start /B mvn spring-boot:run'
+                }
+                sleep time: 10, unit: 'SECONDS'
+            }
+        }
 
+        stage('Playwright E2E Tests') {
+            steps {
+                echo 'Running Playwright end-to-end tests...'
+                dir('todo-app/todo-frontend') {
+                    bat 'npx playwright install'
+                    bat 'npx playwright test'
                 }
             }
         }
@@ -75,10 +87,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and tests for backend and frontend completed successfully.'
+            echo 'Build and all tests completed successfully.'
         }
         failure {
-            echo 'Build failed. Please check logs.'
+            echo 'Build or tests failed. Please check logs.'
         }
     }
 }

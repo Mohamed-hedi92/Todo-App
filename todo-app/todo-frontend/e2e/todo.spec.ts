@@ -1,4 +1,4 @@
-/*import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test('Page has title and adds a todo', async ({ page }) => {
   await page.goto('http://localhost:3000');
@@ -8,7 +8,7 @@ test('Page has title and adds a todo', async ({ page }) => {
 
   await page.fill('input[name="new-todo"]', 'Playwright Test Todo');
   await page.click('button#add-todo');
-  await page.waitForTimeout(2000);
+
 
  const todo = page.locator('text=Playwright Test Todo').first();
  await expect(todo).toBeVisible();
@@ -27,8 +27,6 @@ test('Todo can be added and then deleted', async ({ page }) => {
   await expect(todoItem).toBeVisible();
 
   await todoItem.getByRole('button', { name: 'Löschen' }).click();
-  await page.waitForTimeout(2000);
   await expect(todoItem).toHaveCount(0);
 });
 
-*/
