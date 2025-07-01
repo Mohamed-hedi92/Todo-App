@@ -13,6 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo '=== Checking out Git Repository ==='
                 git branch: 'main',
                     credentialsId: 'gitlab-credentials-id',
                     url: 'https://gitlab.isoad.isogmbh.de/ata/junit.git'
@@ -21,7 +22,7 @@ pipeline {
 
         stage('Backend Build') {
             steps {
-                echo 'Building the backend...'
+                echo '=== Building the Backend ==='
                 dir('todo-app') {
                     bat 'mvn clean install'
                 }
@@ -30,7 +31,7 @@ pipeline {
 
         stage('Backend Unit Tests') {
             steps {
-                echo 'Running backend unit tests...'
+                echo '=== Running Backend Unit Tests ==='
                 dir('todo-app') {
                     bat 'mvn test'
                 }
@@ -39,17 +40,30 @@ pipeline {
 
         stage('Frontend Install') {
             steps {
-                echo 'Installing frontend dependencies...'
+                echo '=== Installing Frontend Dependencies ==='
                 dir('todo-app/todo-frontend') {
+                    bat 'node -v'
+                    bat 'npm -v'
                     bat 'npm install'
+                }
+            }
+        }
+
+        stage('Debug Config Files') {
+            steps {
+                echo '=== Showing jest.config.js and package.json ==='
+                dir('todo-app/todo-frontend') {
+                    bat 'type jest.config.js'
+                    bat 'type package.json'
                 }
             }
         }
 
         stage('Frontend Jest Unit Tests') {
             steps {
-                echo 'Running frontend Jest tests...'
+                echo '=== Running Frontend Jest Tests ==='
                 dir('todo-app/todo-frontend') {
+                    bat 'echo Running: npm test'
                     bat 'npm test'
                 }
             }
@@ -57,17 +71,17 @@ pipeline {
 
         stage('Start Backend') {
             steps {
-                echo 'Starting backend for Playwright tests...'
+                echo '=== Starting Backend for E2E Tests ==='
                 dir('todo-app') {
                     bat 'start /B mvn spring-boot:run'
                 }
-                sleep time: 10, unit: 'SECONDS'  // Wartezeit zum Hochfahren
+                sleep time: 10, unit: 'SECONDS'
             }
         }
 
         stage('Playwright E2E Tests') {
             steps {
-                echo 'Running Playwright end-to-end tests...'
+                echo '=== Running Playwright End-to-End Tests ==='
                 dir('todo-app/todo-frontend') {
                     bat 'npx playwright install'
                     bat 'npm run test:e2e'
@@ -77,7 +91,7 @@ pipeline {
 
         stage('Frontend Build') {
             steps {
-                echo 'Building the frontend...'
+                echo '=== Building the Frontend ==='
                 dir('todo-app/todo-frontend') {
                     bat 'npm run build'
                 }
@@ -87,10 +101,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and all tests completed successfully.'
+            echo '✅ Build and all tests completed successfully.'
         }
         failure {
-            echo 'Build or tests failed. Please check logs.'
+            echo '❌ Build or tests failed. Please check the logs above.'
         }
     }
 }
