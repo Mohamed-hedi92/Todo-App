@@ -21,7 +21,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo '=== Checking out Git Repository ==='
-                git branch: 'main',
+                git branch: 'feature/openapi-clean',
                     credentialsId: 'gitlab-credentials-id',
                     url: 'https://gitlab.isoad.isogmbh.de/ata/junit.git'
 
