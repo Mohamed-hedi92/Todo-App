@@ -11,12 +11,22 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                echo '🧹 Cleaning Jenkins workspace'
+                cleanWs()
+            }
+        }
+
         stage('Checkout') {
             steps {
                 echo '=== Checking out Git Repository ==='
                 git branch: 'main',
                     credentialsId: 'gitlab-credentials-id',
                     url: 'https://gitlab.isoad.isogmbh.de/ata/junit.git'
+
+                echo ' Forcing clean Git working directory'
+                bat 'git clean -fdx'
             }
         }
 
@@ -44,6 +54,8 @@ pipeline {
                 dir('todo-app/todo-frontend') {
                     bat 'node -v'
                     bat 'npm -v'
+                    bat 'npm cache clean --force'
+                    bat 'rmdir /s /q node_modules'
                     bat 'npm install'
                 }
             }
