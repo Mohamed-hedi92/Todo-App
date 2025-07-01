@@ -46,22 +46,11 @@ pipeline {
             }
         }
 
-        stage('Verify Tests Exist') {
-            steps {
-                dir('todo-app/todo-frontend/src') {
-                    bat 'dir /B'
-                }
-            }
-        }
-
-
         stage('Frontend Jest Unit Tests') {
             steps {
                 echo 'Running frontend Jest tests...'
                 dir('todo-app/todo-frontend') {
-                    bat 'move e2e e2e-temp'
                     bat 'npm test'
-                    bat 'move e2e-temp e2e'
                 }
             }
         }
@@ -72,7 +61,7 @@ pipeline {
                 dir('todo-app') {
                     bat 'start /B mvn spring-boot:run'
                 }
-                sleep time: 10, unit: 'SECONDS'
+                sleep time: 10, unit: 'SECONDS'  // Wartezeit zum Hochfahren
             }
         }
 
@@ -81,7 +70,7 @@ pipeline {
                 echo 'Running Playwright end-to-end tests...'
                 dir('todo-app/todo-frontend') {
                     bat 'npx playwright install'
-                    bat 'npx playwright test'
+                    bat 'npm run test:e2e'
                 }
             }
         }
