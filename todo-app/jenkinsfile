@@ -61,8 +61,6 @@ pipeline {
             }
         }
 
-
-
         stage('Debug Config Files') {
             steps {
                 echo '=== Showing jest.config.js and package.json ==='
@@ -75,9 +73,9 @@ pipeline {
 
         stage('Frontend Jest Unit Tests') {
             steps {
-                echo '=== Running Frontend Jest Tests ==='
+                echo '=== Running Frontend Jest Unit Tests ==='
                 dir('todo-app/todo-frontend') {
-                    bat 'echo Running: npm test'
+                    // npm test nutzt in package.json jetzt: jest --testPathIgnorePatterns="e2e" --passWithNoTests
                     bat 'npm test'
                 }
             }
@@ -89,7 +87,8 @@ pipeline {
                 dir('todo-app') {
                     bat 'start /B mvn spring-boot:run'
                 }
-                sleep time: 10, unit: 'SECONDS'
+                // Wartezeit für Backend, ggf. anpassen
+                sleep time: 15, unit: 'SECONDS'
             }
         }
 

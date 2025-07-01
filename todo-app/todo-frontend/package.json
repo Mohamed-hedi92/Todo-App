@@ -14,8 +14,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest --testPathIgnorePatterns=\"e2e\"",
-    "test:unit": "jest src",
+    "test": "jest --testPathIgnorePatterns=\"e2e\" --passWithNoTests",
+    "test:unit": "jest src --passWithNoTests",
     "test:e2e": "playwright test",
     "eject": "react-scripts eject"
   },

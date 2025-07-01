@@ -7,7 +7,8 @@ module.exports = {
     "^.+\\.[jt]sx?$": "babel-jest"
   },
   testMatch: [
-    "<rootDir>/src/**/*.test.[jt]s?(x)"
+    "<rootDir>/src/**/*.test.[jt]s?(x)",
+    "<rootDir>/src/*.test.[jt]s?(x)"
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
