@@ -7,10 +7,12 @@ module.exports = {
     "^.+\\.[jt]sx?$": "babel-jest"
   },
   testMatch: [
-    "<rootDir>/src/**/*.(spec|test).[jt]s?(x)"
+    "<rootDir>/src/**/*.test.[jt]s?(x)"
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/e2e/"
-  ]
+    "/e2e/",
+    "/e2e-temp/",
+    "\\.spec\\.[jt]s$"
+  ],
 };
