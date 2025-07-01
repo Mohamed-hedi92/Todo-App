@@ -55,11 +55,13 @@ pipeline {
                     bat 'node -v'
                     bat 'npm -v'
                     bat 'npm cache clean --force'
-                    bat 'rmdir /s /q node_modules'
+                    bat 'if exist node_modules (echo node_modules existiert && rmdir /s /q node_modules) else (echo node_modules existiert NICHT)'
                     bat 'npm install'
                 }
             }
         }
+
+
 
         stage('Debug Config Files') {
             steps {
