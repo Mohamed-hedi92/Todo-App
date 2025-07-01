@@ -59,7 +59,9 @@ pipeline {
             steps {
                 echo 'Running frontend Jest tests...'
                 dir('todo-app/todo-frontend') {
+                    bat 'move e2e e2e-temp'
                     bat 'npm test'
+                    bat 'move e2e-temp e2e'
                 }
             }
         }
