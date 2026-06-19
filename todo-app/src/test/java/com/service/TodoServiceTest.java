@@ -74,6 +74,7 @@ public class TodoServiceTest {
     @Test
     public void testDeleteTodo() {
         Long id = 1L;
+        when(todoRepository.existsById(id)).thenReturn(true);
         doNothing().when(todoRepository).deleteById(id);
 
         todoService.deleteTodo(id);
@@ -150,15 +151,14 @@ public class TodoServiceTest {
     @Test
     public void testDeleteTodo_NotExistingId() {
         Long id = 9000L;
+        when(todoRepository.existsById(id)).thenReturn(false);
 
+        assertThrows(org.example.todo.exception.TodoNotFoundException.class, () -> {
+            todoService.deleteTodo(id);
+        });
 
-        doNothing().when(todoRepository).deleteById(id);
-
-        todoService.deleteTodo(id);
-
-        verify(todoRepository).deleteById(id);
+        verify(todoRepository, never()).deleteById(any());
     }
-
     @Test
     public void testAddMultipleTodos() {
         Todo t1 = new Todo("eins");
@@ -212,6 +212,7 @@ public class TodoServiceTest {
     @Test
     public void testDeleteTodo_RepositoryThrowsException() {
         Long id = 42L;
+        when(todoRepository.existsById(id)).thenReturn(true);
         doThrow(new RuntimeException("DB Fehler")).when(todoRepository).deleteById(id);
 
         assertThrows(RuntimeException.class, () -> {
@@ -251,16 +252,19 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void testAddTodo_WithEmptyTitle() {
+    public void testAddTodo_WithEmptyTitle_ThrowsException() {
         Todo emptyTitleTodo = new Todo("");
 
-        when(todoRepository.save(emptyTitleTodo)).thenReturn(emptyTitleTodo);
+        // Bean Validation wird durch @Valid im Controller ausgelöst.
+        // Auf Service-Ebene testen wir das Verhalten manuell:
+        jakarta.validation.Validator validator = jakarta.validation.Validation
+                .buildDefaultValidatorFactory()
+                .getValidator();
 
-        Todo result = todoService.addTodo(emptyTitleTodo);
+        var violations = validator.validate(emptyTitleTodo);
 
-        assertNotNull(result);
-        assertEquals("", result.getTitle());
-        verify(todoRepository).save(emptyTitleTodo);
+        assertFalse(violations.isEmpty(), "Leerer Titel sollte Validierungsfehler auslösen");
+        verify(todoRepository, never()).save(any());
     }
 }
 

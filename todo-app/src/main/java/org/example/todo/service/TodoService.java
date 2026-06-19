@@ -3,6 +3,7 @@ package org.example.todo.service;
 import org.example.todo.model.Todo;
 import org.example.todo.repository.TodoRepository;
 import org.springframework.stereotype.Service;
+import org.example.todo.exception.TodoNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class TodoService {
     public Todo updateTitle(Long id, String newTitle) {
         Optional<Todo> optionalTodo = repository.findById(id);
         if (optionalTodo.isEmpty()) {
-            throw new RuntimeException("Todo not found");
+            throw new TodoNotFoundException(id);
         }
         Todo todo = optionalTodo.get();
         todo.setTitle(newTitle);
@@ -55,6 +56,9 @@ public class TodoService {
     }
 
     public void deleteTodo(Long id) {
+        if (!repository.existsById(id)) {
+            throw new TodoNotFoundException(id);
+        }
         repository.deleteById(id);
     }
 

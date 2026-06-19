@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 
 @RestController
 public class TodoController implements TodosApi {
@@ -30,7 +31,7 @@ public class TodoController implements TodosApi {
     }
 
     @Override
-    public ResponseEntity<org.openapitools.model.Todo> todosPost(org.openapitools.model.Todo apiTodo) {
+    public ResponseEntity<org.openapitools.model.Todo> todosPost(@Valid org.openapitools.model.Todo apiTodo) {
         Todo entity = TodoMapper.toEntityTodo(apiTodo);
         Todo saved = todoService.addTodo(entity);
         org.openapitools.model.Todo response = TodoMapper.toApiTodo(saved);

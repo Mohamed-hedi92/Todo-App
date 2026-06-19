@@ -1,35 +1,33 @@
 package org.example.todo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Titel darf nicht leer sein")
+    @Size(max = 200, message = "Titel darf maximal 200 Zeichen lang sein")
     private String title;
+
     private boolean done;
 
-    public Todo() {}
-
+    // Convenience-Konstruktor: nur Titel, done=false, id=null (für neue Todos)
     public Todo(String title) {
         this.title = title;
         this.done = false;
     }
-
-    public Todo(Long id, String title, boolean done) {
-        this.id = id;
-        this.title = title;
-        this.done = done;
-    }
-
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public boolean isDone() { return done; }
-
-    public void setId(Long id) { this.id = id; }
-    public void setTitle(String title) { this.title = title; }
-    public void setDone(boolean done) { this.done = done; }
 }

@@ -118,7 +118,7 @@ public class TodoServiceIntegrationTest {
             todoService.updateTitle(900L, "Will fail");
         });
 
-        assertEquals("Todo not found", exception.getMessage());
+        assertEquals("Todo mit ID 900 wurde nicht gefunden", exception.getMessage());
     }
 
     @Test

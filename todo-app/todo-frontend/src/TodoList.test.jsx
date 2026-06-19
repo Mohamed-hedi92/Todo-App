@@ -5,19 +5,35 @@ import TodoList from "./TodoList";
 import axios from "axios";
 import '@testing-library/jest-dom';
 
+// Mock für axios — WICHTIG: die Mock-Instanz wird INNERHALB der Factory definiert,
+// damit jeder Aufruf von axios.create() dieselbe Instanz zurückgibt.
+// So teilen sich Test und Komponente denselben Mock.
+jest.mock("axios", () => {
+  const mockApi = {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  };
+  return {
+    create: jest.fn(() => mockApi),
+    defaults: { headers: { common: {} } },
+  };
+});
 
-jest.mock("axios");
+// Greift auf die gemeinsame Mock-Instanz zu
+const api = axios.create();
 
 describe("TodoList", () => {
   beforeEach(() => {
-    axios.get.mockResolvedValue({ data: [] });
+    jest.clearAllMocks();
+    api.get.mockResolvedValue({ data: [] });
   });
 
   describe("Hinzufügen von Todos", () => {
-    // Testet das Hinzufügen eines neuen Todos
     it("fügt ein neues Todo hinzu", async () => {
       const testTitle = "Buch lesen";
-      axios.post.mockResolvedValue({ status: 201 });
+      api.post.mockResolvedValue({ status: 201 });
 
       render(<TodoList />);
 
@@ -30,8 +46,8 @@ describe("TodoList", () => {
       await userEvent.click(button);
 
       await waitFor(() => {
-        expect(axios.post).toHaveBeenCalledWith(
-          "http://localhost:8085/todos",
+        expect(api.post).toHaveBeenCalledWith(
+          "/todos",
           { title: testTitle, done: false }
         );
       });
@@ -41,7 +57,6 @@ describe("TodoList", () => {
       });
     });
 
-    // Testet das Hinzufügen mehrerer Todos hintereinander
     it("fügt mehrere Todos nacheinander hinzu", async () => {
       const todos = [
         [],
@@ -52,12 +67,12 @@ describe("TodoList", () => {
         ],
       ];
 
-      axios.get
+      api.get
         .mockResolvedValueOnce({ data: todos[0] })
         .mockResolvedValueOnce({ data: todos[1] })
         .mockResolvedValueOnce({ data: todos[2] });
 
-      axios.post.mockResolvedValue({ status: 201 });
+      api.post.mockResolvedValue({ status: 201 });
 
       render(<TodoList />);
       const input = screen.getByPlaceholderText(/Neue Aufgabe/i);
@@ -79,9 +94,8 @@ describe("TodoList", () => {
       });
     });
 
-    // Testet, dass kein Todo hinzugefügt wird, wenn Eingabefeld leer ist
     it("fügt kein Todo hinzu, wenn das Eingabefeld leer ist", async () => {
-      axios.post.mockClear();
+      api.post.mockClear();
 
       render(<TodoList />);
       const button = screen.getByText(/Hinzufügen/i);
@@ -89,7 +103,7 @@ describe("TodoList", () => {
       await userEvent.click(button);
 
       await waitFor(() => {
-        expect(axios.post).not.toHaveBeenCalled();
+        expect(api.post).not.toHaveBeenCalled();
       });
 
       expect(screen.queryByText(/❌|✅/)).not.toBeInTheDocument();
@@ -97,11 +111,10 @@ describe("TodoList", () => {
   });
 
   describe("Todo bearbeiten", () => {
-    // Testet das Ändern des Titels eines Todos
     it("ändert den Titel eines Todos", async () => {
       const testTodo = { id: 3, title: "Alter Titel", done: false };
-      axios.get.mockResolvedValue({ data: [testTodo] });
-      axios.put.mockResolvedValue({ data: { success: true } });
+      api.get.mockResolvedValue({ data: [testTodo] });
+      api.put.mockResolvedValue({ data: { success: true } });
 
       render(<TodoList />);
 
@@ -119,10 +132,10 @@ describe("TodoList", () => {
       await userEvent.click(speichernButton);
 
       await waitFor(() => {
-        expect(axios.put).toHaveBeenCalledWith(
-          `http://localhost:8085/todos/3/title`,
-          JSON.stringify("Neuer Titel"),
-          { headers: { "Content-Type": "application/json" } }
+        expect(api.put).toHaveBeenCalledWith(
+          `/todos/3/title`,
+          "Neuer Titel",
+          { headers: { "Content-Type": "text/plain" } }
         );
       });
     });
@@ -132,12 +145,11 @@ describe("TodoList", () => {
     const testTodo = { id: 1, title: "Test Todo", done: false };
 
     beforeEach(() => {
-      axios.get.mockResolvedValue({ data: [testTodo] });
+      api.get.mockResolvedValue({ data: [testTodo] });
     });
 
-    // Testet das Markieren eines Todos als erledigt
     it("markiert ein Todo als erledigt", async () => {
-      axios.put.mockResolvedValue({ data: { success: true } });
+      api.put.mockResolvedValue({ data: { success: true } });
 
       render(<TodoList />);
 
@@ -148,17 +160,16 @@ describe("TodoList", () => {
       await userEvent.click(erledigenButton);
 
       await waitFor(() => {
-        expect(axios.put).toHaveBeenCalledWith(
-          `http://localhost:8085/todos/${testTodo.id}/done`
+        expect(api.put).toHaveBeenCalledWith(
+          `/todos/${testTodo.id}/done`
         );
       });
     });
 
-    // Testet das Zurücksetzen eines erledigten Todos
     it("setzt ein erledigtes Todo zurück", async () => {
       const doneTodo = { id: 2, title: "Erledigtes Todo", done: true };
-      axios.get.mockResolvedValue({ data: [doneTodo] });
-      axios.put.mockResolvedValue({ data: { success: true } });
+      api.get.mockResolvedValue({ data: [doneTodo] });
+      api.put.mockResolvedValue({ data: { success: true } });
 
       render(<TodoList />);
 
@@ -169,19 +180,18 @@ describe("TodoList", () => {
       await userEvent.click(zuruecksetzenButton);
 
       await waitFor(() => {
-        expect(axios.put).toHaveBeenCalledWith(
-          `http://localhost:8085/todos/${doneTodo.id}/done`
+        expect(api.put).toHaveBeenCalledWith(
+          `/todos/${doneTodo.id}/done`
         );
       });
     });
   });
 
   describe("Todo löschen", () => {
-    // Testet das Löschen eines Todos
     it("löscht ein Todo beim Klick auf Löschen", async () => {
       const todoToDelete = { id: 3, title: "Todo zum Löschen", done: false };
-      axios.get.mockResolvedValue({ data: [todoToDelete] });
-      axios.delete.mockResolvedValue({ status: 200 });
+      api.get.mockResolvedValue({ data: [todoToDelete] });
+      api.delete.mockResolvedValue({ status: 200 });
 
       render(<TodoList />);
 
@@ -192,22 +202,21 @@ describe("TodoList", () => {
       await userEvent.click(deleteButton);
 
       await waitFor(() => {
-        expect(axios.delete).toHaveBeenCalledWith(
-          `http://localhost:8085/todos/${todoToDelete.id}`
+        expect(api.delete).toHaveBeenCalledWith(
+          `/todos/${todoToDelete.id}`
         );
       });
     });
   });
 
   describe("Anzeige der Todo-Liste", () => {
-    // Testet das Laden und Anzeigen von Todos beim Start
     it("lädt und zeigt Todos beim Start an", async () => {
       const todos = [
         { id: 1, title: "Test Todo 1", done: false },
         { id: 2, title: "Test Todo 2", done: true },
       ];
 
-      axios.get.mockResolvedValue({ data: todos });
+      api.get.mockResolvedValue({ data: todos });
 
       render(<TodoList />);
 
@@ -221,9 +230,8 @@ describe("TodoList", () => {
       expect(screen.getByText("Test Todo 2 ✅")).toBeInTheDocument();
     });
 
-    // Testet, dass keine Todos angezeigt werden, wenn die Liste leer ist
     it("zeigt keine Todos, wenn die Liste leer ist", async () => {
-      axios.get.mockResolvedValue({ data: [] });
+      api.get.mockResolvedValue({ data: [] });
 
       render(<TodoList />);
 
